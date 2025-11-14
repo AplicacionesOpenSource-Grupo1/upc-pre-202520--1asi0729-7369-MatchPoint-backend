@@ -56,7 +56,25 @@ public class Role {
      * @return the role
      */
     public static Role toRoleFromName(String name) {
-        return new Role(Roles.valueOf(name));
+        if (name == null) throw new IllegalArgumentException("Role name cannot be null");
+        var upper = name.trim().toUpperCase();
+        // Try direct match with enum
+        try {
+            return new Role(Roles.valueOf(upper));
+        } catch (IllegalArgumentException ignored) {
+        }
+        // Try with ROLE_ prefix
+        try {
+            var prefixed = upper.startsWith("ROLE_") ? upper : "ROLE_" + upper;
+            return new Role(Roles.valueOf(prefixed));
+        } catch (IllegalArgumentException ignored) {
+        }
+        // Heuristics: map common terms to existing roles
+        if (upper.contains("ADMIN")) return new Role(Roles.ROLE_ADMIN);
+        if (upper.contains("INSTRUCTOR")) return new Role(Roles.ROLE_INSTRUCTOR);
+        if (upper.contains("USER")) return new Role(Roles.ROLE_USER);
+
+        throw new IllegalArgumentException("Unknown role name: " + name);
     }
 
     /**

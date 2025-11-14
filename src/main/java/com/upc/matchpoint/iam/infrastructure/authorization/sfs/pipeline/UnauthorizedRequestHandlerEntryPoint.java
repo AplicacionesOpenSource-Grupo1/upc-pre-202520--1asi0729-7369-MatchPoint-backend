@@ -34,7 +34,7 @@ public class UnauthorizedRequestHandlerEntryPoint implements AuthenticationEntry
      */
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException) throws IOException, ServletException {
-        LOGGER.error("Unauthorized request: {}", authenticationException.getMessage());
+        LOGGER.error("Unauthorized request at URI {}: {}", request.getRequestURI(), authenticationException.getMessage());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized request detected");
     }
 }

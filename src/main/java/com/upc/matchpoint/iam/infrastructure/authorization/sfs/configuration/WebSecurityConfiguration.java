@@ -103,8 +103,9 @@ public class WebSecurityConfiguration {
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
                 .sessionManagement( customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(
-                                "/api/v1/authentication/**",
+                    .requestMatchers(
+                        "/api/v1/authentication/**",
+                        "/api/v1/auth/**",
                                 "/api/v1/users/**",
                                 "/api/v1/courts/**",
                                 "/api/v1/coaches/**",
