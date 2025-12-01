@@ -1,14 +1,11 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: matchpoint-db
+databases:
+  - name: matchpoint-db
+    databaseName: matchpoint
+    user: matchpoint
     plan: free
     region: oregon
-    databaseName: matchpoint
-    databaseUser: matchpoint
-    ipAllowList: []
 
-  # Spring Boot Application
+services:
   - type: web
     name: matchpoint-api
     runtime: java
