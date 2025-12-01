@@ -25,15 +25,22 @@ public class DatabaseConfig {
     @Bean
     @Primary
     public DataSource dataSource(Environment env) {
-        // Prefer explicit environment variable DATABASE_URL used by Render
+        // Prefer explicit environment variable DATABASE_URL used by Render.
+        // Try multiple common env/property names and treat empty values as absent.
         String raw = System.getenv("DATABASE_URL");
-        if (raw == null || raw.isBlank()) {
-            raw = env.getProperty("spring.datasource.url");
-        }
+        if (raw == null || raw.isBlank()) raw = System.getenv("SPRING_DATASOURCE_URL");
+        if (raw == null || raw.isBlank()) raw = System.getenv("JDBC_DATABASE_URL");
+        if (raw == null || raw.isBlank()) raw = env.getProperty("spring.datasource.url");
+        if (raw == null || raw.isBlank()) raw = env.getProperty("JDBC_DATABASE_URL");
 
         String jdbcUrl;
         String username = env.getProperty("spring.datasource.username");
         String password = env.getProperty("spring.datasource.password");
+        // Also attempt to read username/password from common env vars used by hosting
+        if ((username == null || username.isBlank())) username = System.getenv("SPRING_DATASOURCE_USERNAME");
+        if ((username == null || username.isBlank())) username = System.getenv("JDBC_DATABASE_USERNAME");
+        if ((password == null || password.isBlank())) password = System.getenv("SPRING_DATASOURCE_PASSWORD");
+        if ((password == null || password.isBlank())) password = System.getenv("JDBC_DATABASE_PASSWORD");
 
         if (raw == null || raw.isBlank()) {
             // fallback to Spring Boot default behaviour (will use application.properties values)
@@ -90,6 +97,13 @@ public class DatabaseConfig {
 
         // If running in local profile and the configured jdbcUrl points to MySQL but driver is missing, fallback to H2 in-memory
         boolean isLocal = Arrays.asList(env.getActiveProfiles()).contains("local");
+        if ((jdbcUrl == null || jdbcUrl.isBlank()) && isLocal) {
+            // If no JDBC URL resolved and running local, default to a reasonable local MySQL URL
+            jdbcUrl = "jdbc:mysql://localhost:3306/matchpoint?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+            if (username == null || username.isBlank()) username = "root";
+            if (password == null) password = "123456789";
+        }
+
         if (isLocal && jdbcUrl != null && jdbcUrl.toLowerCase().startsWith("jdbc:mysql:")) {
             try {
                 Class.forName("com.mysql.cj.jdbc.Driver");
