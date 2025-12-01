@@ -12,8 +12,7 @@ services:
     plan: free
     region: oregon
     branch: master
-    buildCommand: ./mvnw clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -jar target/matchpoint-0.0.1-SNAPSHOT.jar
+    dockerfilePath: Dockerfile
     envVars:
       - key: JAVA_VERSION
         value: 21
