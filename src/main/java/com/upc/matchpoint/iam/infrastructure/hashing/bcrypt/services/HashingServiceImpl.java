@@ -3,12 +3,14 @@ package com.upc.matchpoint.iam.infrastructure.hashing.bcrypt.services;
 import com.upc.matchpoint.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Primary;
 
 /**
  * This class implements the {@link BCryptHashingService} interface.
  * It is used to hash passwords using the BCrypt algorithm.
  */
 @Service
+@Primary
 public class HashingServiceImpl implements BCryptHashingService {
     private final BCryptPasswordEncoder passwordEncoder;
 
