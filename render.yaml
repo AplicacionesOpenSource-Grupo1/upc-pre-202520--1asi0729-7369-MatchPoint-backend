@@ -8,7 +8,6 @@ databases:
 services:
   - type: web
     name: matchpoint-api
-    runtime: java
     plan: free
     region: oregon
     branch: master
