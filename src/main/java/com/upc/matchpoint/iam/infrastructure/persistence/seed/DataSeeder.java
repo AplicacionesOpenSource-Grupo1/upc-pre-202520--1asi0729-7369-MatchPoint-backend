@@ -9,6 +9,7 @@ import com.upc.matchpoint.iam.infrastructure.hashing.bcrypt.BCryptHashingService
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
  */
 @Component
 @Profile("!test")
+@Transactional
 public class DataSeeder implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
