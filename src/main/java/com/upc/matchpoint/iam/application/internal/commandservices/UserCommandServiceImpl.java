@@ -9,6 +9,7 @@ import com.upc.matchpoint.iam.domain.services.UserCommandService;
 import com.upc.matchpoint.iam.infrastructure.persistence.jpa.repositories.RoleRepository;
 import com.upc.matchpoint.iam.infrastructure.persistence.jpa.repositories.UserRepository;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
