@@ -68,7 +68,9 @@ public class UserCommandServiceImpl implements UserCommandService {
     public Optional<User> handle(SignUpCommand command) {
         if (userRepository.existsByUsername(command.username()))
             throw new RuntimeException("Username already exists");
-        var roles = command.roles().stream().map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> new RuntimeException("Role name not found"))).toList();
+        var roles = (command.roles() == null || command.roles().isEmpty())
+            ? List.of(roleRepository.findByName(com.upc.matchpoint.iam.domain.model.valueobjects.Roles.ROLE_USER).orElseThrow(() -> new RuntimeException("Role name not found")))
+            : command.roles().stream().map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> new RuntimeException("Role name not found"))).toList();
         var user = new User(command.username(), hashingService.encode(command.password()), roles);
         userRepository.save(user);
         return userRepository.findByUsername(command.username());
