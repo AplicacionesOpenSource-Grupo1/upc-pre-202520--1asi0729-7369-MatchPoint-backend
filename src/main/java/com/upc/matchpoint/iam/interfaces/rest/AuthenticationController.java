@@ -51,15 +51,19 @@ public class AuthenticationController {
     @Operation(summary = "Sign-in", description = "Sign-in with the provided credentials.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User authenticated successfully."),
-            @ApiResponse(responseCode = "404", description = "User not found.")})
+            @ApiResponse(responseCode = "401", description = "Invalid credentials.")})
     public ResponseEntity<AuthenticatedUserResource> signIn(@RequestBody SignInResource signInResource) {
-        var signInCommand = SignInCommandFromResourceAssembler.toCommandFromResource(signInResource);
-        var authenticatedUser = userCommandService.handle(signInCommand);
-        if (authenticatedUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        try {
+            var signInCommand = SignInCommandFromResourceAssembler.toCommandFromResource(signInResource);
+            var authenticatedUser = userCommandService.handle(signInCommand);
+            if (authenticatedUser.isEmpty()) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+            }
+            var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(authenticatedUser.get().getLeft(), authenticatedUser.get().getRight());
+            return ResponseEntity.ok(authenticatedUserResource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
         }
-        var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(authenticatedUser.get().getLeft(), authenticatedUser.get().getRight());
-        return ResponseEntity.ok(authenticatedUserResource);
     }
 
     /**
@@ -73,13 +77,16 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "201", description = "User created successfully."),
             @ApiResponse(responseCode = "400", description = "Bad request.")})
     public ResponseEntity<UserResource> signUp(@RequestBody SignUpResource signUpResource) {
-        var signUpCommand = SignUpCommandFromResourceAssembler.toCommandFromResource(signUpResource);
-        var user = userCommandService.handle(signUpCommand);
-        if (user.isEmpty()) {
+        try {
+            var signUpCommand = SignUpCommandFromResourceAssembler.toCommandFromResource(signUpResource);
+            var user = userCommandService.handle(signUpCommand);
+            if (user.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user.get());
+            return new ResponseEntity<>(userResource, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
         }
-        var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user.get());
-        return new ResponseEntity<>(userResource, HttpStatus.CREATED);
-
     }
 }
